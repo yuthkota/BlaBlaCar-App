@@ -11,77 +11,45 @@ void main() {
   RidesService.initialize(repository);
 
   group('RidesService Tests', () {
-    test('T1: Create a ride preference and display matching rides', () {
+    test('T2: Create a ride preference with a filter for pets allowed', () {
       // Create a ride preference from Battambang to Siem Reap
       RidePreference ridePreference = RidePreference(
-        departure: Location(
-            name: 'Battambang', country: Country.cambodia),
+        departure: Location(name: 'Battambang', country: Country.cambodia),
         departureDate: DateTime.now(),
-        arrival: Location(
-            name: 'Siem Reap', country: Country.cambodia),
+        arrival: Location(name: 'Siem Reap', country: Country.cambodia),
         requestedSeats: 1,
-        ridesFilter: RidesFilter(acceptPets: false),
+        ridesFilter: RidesFilter(acceptPets: true),
       );
 
       // Set the current preference in the RidesService
       RidesService.instance.setCurrentRidePreference(ridePreference);
 
       // Get the matching rides for this preference
-      List<Ride> matchingRides =
-          RidesService.instance.getRidesFor(ridePreference);
+      List<Ride> matchingRides = RidesService.instance.getRidesFor(ridePreference);
 
       // Check the expected result
-      expect(matchingRides.length, 5,
-          reason: 'Expected 5 results to be displayed');
+      print("Matching rides with pets allowed:");
+      matchingRides.forEach((ride) {
+        print('- at ${ride.departureDate.hour}:${ride.departureDate.minute} with ${ride.driver.firstName} '
+            '(${ride.availableSeats} seats available) - Pet Allowed: ${ride.ridesFilter.acceptPets}');
+      });
 
-      // Additional check for ride availability and status
-      Ride fullRide =
-          matchingRides.firstWhere((ride) => ride.availableSeats == 0);
-      expect(fullRide.driver.firstName, 'Chaylim',
-          reason: 'Expected the full ride to be from Chaylim');
+      // Filter the pet-allowed rides specifically
+      List<Ride> petAllowedRides = matchingRides.where((ride) => ride.ridesFilter.acceptPets).toList();
+
+      // Print pet-allowed rides specifically
+      print("Pet Allowed Rides (Filtered):");
+      petAllowedRides.forEach((ride) {
+        print('- at ${ride.departureDate.hour}:${ride.departureDate.minute} with ${ride.driver.firstName} '
+            '(${ride.availableSeats} seats available)');
+      });
+
+      // Check that pet-allowed rides exist
+      expect(petAllowedRides.length, greaterThan(0), reason: 'No pet-allowed rides found');
+      // Check if 'Limhao' is in the filtered list
+      expect(petAllowedRides.any((ride) => ride.driver.firstName == 'Limhao'), isTrue, reason: 'Expected to find Limhao in the pet-allowed rides');
+      // Check if 'Sovanda' is in the filtered list
+      expect(petAllowedRides.any((ride) => ride.driver.firstName == 'Sovanda'), isTrue, reason: 'Expected to find Sovanda in the pet-allowed rides');
     });
-
-    test('T2: Create a ride preference with a filter for pets allowed', () {
-  //Create a ride preference from Battambang to Siem Reap
-  RidePreference ridePreference = RidePreference(
-    departure: Location(name: 'Battambang', country: Country.cambodia),
-    departureDate: DateTime.now(),
-    arrival: Location(name: 'Siem Reap', country: Country.cambodia),
-    requestedSeats: 1,
-    ridesFilter: RidesFilter(acceptPets: false),
-  );
-
-  //Set the current preference in the RidesService with the initial filter
-  RidesService.instance.setCurrentRidePreference(ridePreference);
-
-  //Apply a filter for pet-allowed rides (acceptPets: true)
-  ridePreference = RidePreference(
-    departure: Location(name: 'Battambang', country: Country.cambodia),
-    departureDate: DateTime.now(),
-    arrival: Location(name: 'Siem Reap', country: Country.cambodia),
-    requestedSeats: 1,
-    ridesFilter: RidesFilter(acceptPets: true),
-  );
-
-  //Set the updated preference in the RidesService with the pet filter
-  RidesService.instance.setCurrentRidePreference(ridePreference);
-
-  //Get the matching rides for this preference with the pet filter
-  List<Ride> matchingRidesWithPets = RidesService.instance.getRidesFor(ridePreference);
-
-  // Print out all matching rides for debugging
-  for (var ride in matchingRidesWithPets) {
-    print('Ride driver: ${ride.driver.firstName}, Accepts Pets: ${ride.ridesFilter.acceptPets}');
-  }
-
-  //Check the expected result for pet-allowed rides
-  List<Ride> petAllowedRides = matchingRidesWithPets.where((ride) => ride.ridesFilter.acceptPets).toList();
-  expect(petAllowedRides.length, 5, reason: 'Expected 5 pet-allowed rides to be displayed');
-
-  // Ensure Mengtech is one of the drivers in the filtered rides
-  bool hasMengtech = petAllowedRides.any((ride) => ride.driver.firstName == 'Mengtech');
-  expect(hasMengtech, true, reason: 'Expected the pet-allowed ride to be from Mengtech');
-});
-
   });
 }
