@@ -1,13 +1,12 @@
-import 'package:week_3_blabla_project/model/ride/locations.dart';
+import '../model/ride/locations.dart';
+import '../repository/location_repositoy.dart';
 
-import '../dummy_data/dummy_data.dart';
-
-////
-///   This service handles:
-///   - The list of available rides
-///
 class LocationsService {
+  final LocationsRepository locationsRepository;
 
-  static const List<Location> availableLocations = fakeLocations; 
- 
+  LocationsService(this.locationsRepository);
+
+  List<Location> getAvailableLocations() {
+    return locationsRepository.getLocations();
+  }
 }

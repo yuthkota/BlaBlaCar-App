@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:week_3_blabla_project/model/ride/locations.dart';
-
+import '../../repository/mock/mock_location_repository.dart';
 import '../../service/locations_service.dart';
 import '../../theme/theme.dart';
 
-///
-/// This full-screen modal is in charge of providing (if confirmed) a selected location.
-///
 class BlaLocationPicker extends StatefulWidget {
-  final Location?
-      initLocation; // The picker can be triguer with an existing location name
+  final Location? initLocation;
 
   const BlaLocationPicker({super.key, this.initLocation});
 
@@ -19,17 +15,19 @@ class BlaLocationPicker extends StatefulWidget {
 
 class _BlaLocationPickerState extends State<BlaLocationPicker> {
   List<Location> filteredLocations = [];
-
-  // ----------------------------------
-  // Initialize the Form attributes
-  // ----------------------------------
+  late LocationsService locationsService;
 
   @override
   void initState() {
     super.initState();
+    // Initialize LocationsService with MockLocationsRepository
+    locationsService = LocationsService(MockLocationsRepository());
 
+    // Initialize filtered locations
     if (widget.initLocation != null) {
       filteredLocations = getLocationsFor(widget.initLocation!.name);
+    } else {
+      filteredLocations = locationsService.getAvailableLocations();
     }
   }
 
@@ -45,7 +43,6 @@ class _BlaLocationPickerState extends State<BlaLocationPicker> {
     List<Location> newSelection = [];
 
     if (searchText.length > 1) {
-      // We start to search from 2 characters only.
       newSelection = getLocationsFor(searchText);
     }
 
@@ -55,7 +52,7 @@ class _BlaLocationPickerState extends State<BlaLocationPicker> {
   }
 
   List<Location> getLocationsFor(String text) {
-    return LocationsService.availableLocations
+    return locationsService.getAvailableLocations()
         .where((location) =>
             location.name.toUpperCase().contains(text.toUpperCase()))
         .toList();
@@ -74,7 +71,6 @@ class _BlaLocationPickerState extends State<BlaLocationPicker> {
             onBackPressed: onBackSelected,
             onSearchChanged: onSearchChanged,
           ),
-
           Expanded(
             child: ListView.builder(
               itemCount: filteredLocations.length,
@@ -90,9 +86,6 @@ class _BlaLocationPickerState extends State<BlaLocationPicker> {
   }
 }
 
-///
-/// This tile represents an item in the list of past entered ride inputs
-///s
 class LocationTile extends StatelessWidget {
   final Location location;
   final Function(Location location) onSelected;
@@ -121,10 +114,6 @@ class LocationTile extends StatelessWidget {
   }
 }
 
-///
-///  The Search bar combines the search input + the navigation back button
-///  A clear button appears when search contains some text.
-///
 class BlaSearchBar extends StatefulWidget {
   const BlaSearchBar(
       {super.key, required this.onSearchChanged, required this.onBackPressed});
@@ -143,7 +132,7 @@ class _BlaSearchBarState extends State<BlaSearchBar> {
   bool get searchIsNotEmpty => _controller.text.isNotEmpty;
 
   void onChanged(String newText) {
-    // 1 - Notity the listener
+    // 1 - Notify the listener
     widget.onSearchChanged(newText);
 
     // 2 - Update the cross icon
