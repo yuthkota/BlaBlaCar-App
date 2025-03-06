@@ -1,3 +1,5 @@
+import 'package:week_3_blabla_project/service/rides_service.dart';
+
 import '../model/ride/locations.dart';
 import '../model/ride/ride.dart';
 import '../model/ride_pref/ride_pref.dart';
@@ -62,36 +64,42 @@ List<RidePreference> fakeRidePrefs = [
     departureDate: DateTime.now().add(Duration(days: 1)), // Tomorrow
     arrival: fakeLocations[3], // Paris
     requestedSeats: 2,
+    ridesFilter: RidesFilter(acceptPets: true),
   ),
   RidePreference(
     departure: fakeLocations[1], // Manchester
     departureDate: DateTime.now().add(Duration(days: 7)), // Next week
     arrival: fakeLocations[4], // Lyon
     requestedSeats: 3,
+    ridesFilter: RidesFilter(acceptPets: true),
   ),
   RidePreference(
     departure: fakeLocations[2], // Birmingham
     departureDate: DateTime.now(), // Today
     arrival: fakeLocations[5], // Marseille
     requestedSeats: 1,
+    ridesFilter: RidesFilter(acceptPets: true),
   ),
   RidePreference(
     departure: fakeLocations[0], // London
     departureDate: DateTime.now().add(Duration(days: 1)), // Tomorrow
     arrival: fakeLocations[3], // Paris
     requestedSeats: 2,
+    ridesFilter: RidesFilter(acceptPets: true),
   ),
   RidePreference(
     departure: fakeLocations[4], // Manchester
     departureDate: DateTime.now().add(Duration(days: 7)), // Next week
     arrival: fakeLocations[0], // Lyon
     requestedSeats: 3,
+    ridesFilter: RidesFilter(acceptPets: true),
   ),
   RidePreference(
     departure: fakeLocations[5], // Birmingham
     departureDate: DateTime.now(), // Today
     arrival: fakeLocations[1], // Marseille
     requestedSeats: 1,
+    ridesFilter: RidesFilter(acceptPets: true),
   ),
 ];
 
@@ -171,12 +179,13 @@ List<Ride> fakeRides = List.generate(50, (index) {
       .roundToDouble(); // Price between 5€ and 25€
 
   return Ride(
-    departureLocation: departureLocation,
-    departureDate: departureTime,
-    arrivalLocation: arrivalLocation,
-    arrivalDateTime: arrivalTime,
-    driver: driver,
-    availableSeats: availableSeats,
-    pricePerSeat: pricePerSeat,
-  );
+  departureLocation: departureLocation,
+  departureDate: departureTime,
+  arrivalLocation: arrivalLocation,
+  arrivalDateTime: arrivalTime,
+  driver: driver,
+  availableSeats: availableSeats,
+  pricePerSeat: pricePerSeat,
+  ridesFilter: RidesFilter(acceptPets: random.nextBool()),
+);
 });
